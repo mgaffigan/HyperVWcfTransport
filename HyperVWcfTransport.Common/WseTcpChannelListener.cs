@@ -14,7 +14,7 @@ namespace HyperVWcfTransport.Common
         BufferManager bufferManager;
         MessageEncoderFactory encoderFactory;
         Socket listenSocket;
-        Uri uri;
+        public override Uri Uri { get; }
 
         public WseTcpChannelListener(WseTcpTransportBindingElement bindingElement, BindingContext context)
             : base(context.Binding)
@@ -33,19 +33,14 @@ namespace HyperVWcfTransport.Common
                 this.encoderFactory = new MtomMessageEncodingBindingElement().CreateMessageEncoderFactory();
             }
 
-            this.uri = new Uri(context.ListenUriBaseAddress, context.ListenUriRelativeAddress);
+            this.Uri = new Uri(context.ListenUriBaseAddress, context.ListenUriRelativeAddress);
         }
 
-        public override Uri Uri => this.uri;
+        #region Open / Close
 
         void OpenListenSocket()
         {
-            if (uri == null)
-            {
-                throw new InvalidOperationException("SetUri must be called before opening this Channel Listener");
-            }
-
-            IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, uri.Port);
+            var localEndpoint = Hostname.ParseAsync(Uri.Authority, 8081).Result.Single();
             this.listenSocket = new Socket(localEndpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             this.listenSocket.Bind(localEndpoint);
             this.listenSocket.Listen(10);
@@ -75,28 +70,48 @@ namespace HyperVWcfTransport.Common
 
         protected override void OnEndClose(IAsyncResult result) => CompletedAsyncResult.End(result);
 
+        #endregion
+
+        #region Accept
+
         protected override IDuplexSessionChannel OnAcceptChannel(TimeSpan timeout)
         {
             Socket dataSocket = listenSocket.Accept();
-            return new ServerTcpDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(uri), this);
+            return new ServerTcpDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(Uri), this);
         }
 
         protected override IAsyncResult OnBeginAcceptChannel(TimeSpan timeout, AsyncCallback callback, object state)
         {
-            //return (async () =>
-            //{
-
-            //})();
-            return new AcceptChannelAsyncResult(timeout, this, callback, state);
+            return Tap.Run(callback, state, async () =>
+            {
+                try
+                {
+                    var dataSocket = await listenSocket.AcceptAsync();
+                    return (IDuplexSessionChannel)new ServerTcpDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(this.Uri), this);
+                }
+                catch (SocketException ex) when (ex.SocketErrorCode == SocketError.OperationAborted)
+                {
+                    return null;
+                }
+            });
         }
 
-        protected override IDuplexSessionChannel OnEndAcceptChannel(IAsyncResult result) => AcceptChannelAsyncResult.End(result);
+        protected override IDuplexSessionChannel OnEndAcceptChannel(IAsyncResult result) => Tap.Complete<IDuplexSessionChannel>(result);
 
-        protected override bool OnWaitForChannel(TimeSpan timeout) => throw new NotSupportedException();
+        #endregion
 
-        protected override IAsyncResult OnBeginWaitForChannel(TimeSpan timeout, AsyncCallback callback, object state) => throw new NotSupportedException();
+        #region WaitForChannel
 
-        protected override bool OnEndWaitForChannel(IAsyncResult result) => throw new NotSupportedException();
+        protected override bool OnWaitForChannel(TimeSpan timeout)
+            => throw new NotSupportedException();
+
+        protected override IAsyncResult OnBeginWaitForChannel(TimeSpan timeout, AsyncCallback callback, object state)
+            => throw new NotSupportedException();
+
+        protected override bool OnEndWaitForChannel(IAsyncResult result)
+            => throw new NotSupportedException();
+
+        #endregion
 
         class ServerTcpDuplexSessionChannel : WseTcpDuplexSessionChannel
         {
@@ -106,73 +121,6 @@ namespace HyperVWcfTransport.Common
                 WseTcpDuplexSessionChannel.AnonymousAddress.Uri, channelManager)
             {
                 base.InitializeSocket(socket);
-            }
-        }
-
-        class AcceptChannelAsyncResult : AsyncResult
-        {
-            TimeSpan timeout;
-            WseTcpChannelListener listener;
-            IDuplexSessionChannel channel;
-
-            static AsyncCallback acceptCallback = new AsyncCallback(OnAccept);
-
-            public AcceptChannelAsyncResult(TimeSpan timeout, WseTcpChannelListener listener, AsyncCallback callback, object state)
-                : base(callback, state)
-            {
-                this.timeout = timeout;
-                this.listener = listener;
-
-                IAsyncResult acceptResult = listener.listenSocket.BeginAccept(acceptCallback, this);
-                if (!acceptResult.CompletedSynchronously)
-                {
-                    return;
-                }
-
-                if (CompleteAccept(acceptResult))
-                {
-                    base.Complete(true);
-                }
-            }
-
-            bool CompleteAccept(IAsyncResult result)
-            {
-                Socket dataSocket = listener.listenSocket.EndAccept(result);
-                channel = new ServerTcpDuplexSessionChannel(this.listener.encoderFactory, this.listener.bufferManager, dataSocket, new EndpointAddress(this.listener.uri), this.listener);
-                return true;
-            }
-
-            static void OnAccept(IAsyncResult result)
-            {
-                if (result.CompletedSynchronously)
-                {
-                    return;
-                }
-
-                AcceptChannelAsyncResult thisPtr = (AcceptChannelAsyncResult)result.AsyncState;
-
-                Exception completionException = null;
-                bool completeSelf = false;
-                try
-                {
-                    completeSelf = thisPtr.CompleteAccept(result);
-                }
-                catch (Exception e)
-                {
-                    completeSelf = true;
-                    completionException = e;
-                }
-
-                if (completeSelf)
-                {
-                    thisPtr.Complete(false, completionException);
-                }
-            }
-
-            public static IDuplexSessionChannel End(IAsyncResult result)
-            {
-                AcceptChannelAsyncResult thisPtr = AsyncResult.End<AcceptChannelAsyncResult>(result);
-                return thisPtr.channel;
             }
         }
     }

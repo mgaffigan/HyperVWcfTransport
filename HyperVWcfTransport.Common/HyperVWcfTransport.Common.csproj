@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="ApmHelpers\AsyncResult.cs" />
     <Compile Include="ApmHelpers\CompletedAsyncResult.cs" />
+    <Compile Include="ApmHelpers\TapInterop.cs" />
+    <Compile Include="WseClientTcpDuplexSessionChannel.cs" />
     <Compile Include="CustomNetTcpBinding.cs" />
     <Compile Include="Hostname.cs" />
     <Compile Include="IServer.cs" />

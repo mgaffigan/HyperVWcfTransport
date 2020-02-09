@@ -9,12 +9,7 @@ namespace HyperVWcfTransport
 {
     public static class Hostname
     {
-        public static IPEndPoint[] Parse(string endpointstring)
-        {
-            return Parse(endpointstring, -1);
-        }
-
-        public static IPEndPoint[] Parse(string endpointstring, int defaultport)
+        public static async Task<IPEndPoint[]> ParseAsync(string endpointstring, int defaultport)
         {
             if (string.IsNullOrEmpty(endpointstring)
                 || endpointstring.Trim().Length == 0)
@@ -49,7 +44,7 @@ namespace HyperVWcfTransport
                 }
                 else
                 {
-                    ipaddy = getIPfromHost(values[0]);
+                    ipaddy = await getIPfromHostAsync(values[0]);
                 }
             }
             else if (values.Length > 2) //ipv6
@@ -95,6 +90,16 @@ namespace HyperVWcfTransport
         private static IPAddress[] getIPfromHost(string p)
         {
             var hosts = Dns.GetHostAddresses(p);
+
+            if (hosts == null || hosts.Length == 0)
+                throw new ArgumentException(string.Format("Host not found: {0}", p));
+
+            return hosts;
+        }
+
+        private static async Task<IPAddress[]> getIPfromHostAsync(string p)
+        {
+            var hosts = await Dns.GetHostAddressesAsync(p);
 
             if (hosts == null || hosts.Length == 0)
                 throw new ArgumentException(string.Format("Host not found: {0}", p));
