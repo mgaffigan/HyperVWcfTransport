@@ -46,17 +46,18 @@
     <Compile Include="ApmHelpers\AsyncResult.cs" />
     <Compile Include="ApmHelpers\CompletedAsyncResult.cs" />
     <Compile Include="ApmHelpers\TapInterop.cs" />
-    <Compile Include="WseClientTcpDuplexSessionChannel.cs" />
-    <Compile Include="CustomNetTcpBinding.cs" />
-    <Compile Include="Hostname.cs" />
+    <Compile Include="HyperVNetClientDuplexSessionChannel.cs" />
+    <Compile Include="HyperVNetBinding.cs" />
     <Compile Include="IServer.cs" />
     <Compile Include="ApmHelpers\TypedAsyncResult.cs" />
     <Compile Include="ApmHelpers\TypedCompletedAsyncResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WseTcpChannelFactory.cs" />
-    <Compile Include="WseTcpChannelListener.cs" />
-    <Compile Include="WseTcpDuplexSessionChannel.cs" />
-    <Compile Include="WseTcpTransportBindingElement.cs" />
+    <Compile Include="HyperVNetChannelFactory.cs" />
+    <Compile Include="HyperVNetChannelListener.cs" />
+    <Compile Include="HyperVNetDuplexSessionChannel.cs" />
+    <Compile Include="HyperVNetBindingElement.cs" />
+    <Compile Include="Win32\HyperVSocketEndPoint.cs" />
+    <Compile Include="Win32\NativeMethods.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

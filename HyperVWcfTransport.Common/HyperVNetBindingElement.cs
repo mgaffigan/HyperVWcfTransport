@@ -6,33 +6,33 @@ using System.Xml;
 
 namespace HyperVWcfTransport.Common
 {
-    class WseTcpTransportBindingElement
+    class HyperVNetBindingElement
         : TransportBindingElement // to signal that we're a transport
         , IPolicyExportExtension // for policy export
     {
-        public WseTcpTransportBindingElement()
+        public HyperVNetBindingElement()
             : base()
         {
         }
 
-        protected WseTcpTransportBindingElement(WseTcpTransportBindingElement other)
+        protected HyperVNetBindingElement(HyperVNetBindingElement other)
             : base(other)
         {
         }
 
         public override string Scheme
         {
-            get { return "wse.tcp"; }
+            get { return "hypervnb"; }
         }
 
         public override IChannelFactory<TChannel> BuildChannelFactory<TChannel>(BindingContext context)
         {
-            return (IChannelFactory<TChannel>)(object)new WseTcpChannelFactory(this, context);
+            return (IChannelFactory<TChannel>)(object)new HyperVNetChannelFactory(this, context);
         }
 
         public override IChannelListener<TChannel> BuildChannelListener<TChannel>(BindingContext context)
         {
-            return (IChannelListener<TChannel>)(object)new WseTcpChannelListener(this, context);
+            return (IChannelListener<TChannel>)(object)new HyperVNetChannelListener(this, context);
         }
 
         // We only support IDuplexSession for our client ChannelFactories
@@ -59,7 +59,7 @@ namespace HyperVWcfTransport.Common
 
         public override BindingElement Clone()
         {
-            return new WseTcpTransportBindingElement(this);
+            return new HyperVNetBindingElement(this);
         }
 
         public override T GetProperty<T>(BindingContext context)
@@ -94,9 +94,9 @@ namespace HyperVWcfTransport.Common
 
             ICollection<XmlElement> bindingAssertions = context.GetBindingAssertions();
             XmlDocument xmlDocument = new XmlDocument();
-            const string prefix = "tcp";
-            const string transportAssertion = "wse.tcp";
-            const string tcpPolicyNamespace = "http://sample.schemas.microsoft.com/policy/tcp";
+            const string prefix = "hv";
+            const string transportAssertion = "hypervnb";
+            const string tcpPolicyNamespace = "urn:rmg:hyperv:nb";
             bindingAssertions.Add(xmlDocument.CreateElement(prefix, transportAssertion, tcpPolicyNamespace));
         }
     }

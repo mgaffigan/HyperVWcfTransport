@@ -2,14 +2,14 @@
 
 namespace HyperVWcfTransport.Common
 {
-    public class CustomNetTcpBinding : Binding, IBindingRuntimePreferences
+    public class HyperVNetBinding : Binding, IBindingRuntimePreferences
     {
-        WseTcpTransportBindingElement transport;
+        HyperVNetBindingElement transport;
         BinaryMessageEncodingBindingElement encoding;
 
-        public CustomNetTcpBinding()
+        public HyperVNetBinding()
         {
-            transport = new WseTcpTransportBindingElement();
+            transport = new HyperVNetBindingElement();
             encoding = new BinaryMessageEncodingBindingElement();
         }
 

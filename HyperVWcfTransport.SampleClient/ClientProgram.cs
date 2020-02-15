@@ -16,7 +16,7 @@ namespace HyperVWcfTransport.SampleClient
         {
             Thread.Sleep(250);
 
-            var client = new ServerClient(new EndpointAddress("wse.tcp://192.168.190.81:4056/"));
+            var client = new ServerClient(new EndpointAddress("hypervnb://642d4719-f5d7-477d-9ca3-2c46c280052d/C7240163-6E2B-4466-9E41-FF74E7F0DE47"));
             client.Open();
             Console.WriteLine(client.DoThing("bar"));
             Console.WriteLine(client.DoThing(Console.ReadLine()));
@@ -28,7 +28,7 @@ namespace HyperVWcfTransport.SampleClient
     class ServerClient : ClientBase<IServer>, IServer
     {
         public ServerClient(EndpointAddress addy)
-            : base(new CustomNetTcpBinding(), addy)
+            : base(new HyperVNetBinding(), addy)
         {
         }
 

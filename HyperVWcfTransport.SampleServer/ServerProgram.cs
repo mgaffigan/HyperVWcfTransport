@@ -24,8 +24,8 @@ namespace HyperVWcfTransport.SampleServer
         static void Main(string[] args)
         {
             var sh = new ServiceHost(new SampleServer());
-            var binding = new CustomNetTcpBinding();
-            sh.AddServiceEndpoint(typeof(IServer), binding, "wse.tcp://192.168.190.81:4056/");
+            var binding = new HyperVNetBinding();
+            sh.AddServiceEndpoint(typeof(IServer), binding, "hypervnb://00000000-0000-0000-0000-000000000000/C7240163-6E2B-4466-9E41-FF74E7F0DE47");
             sh.Open();
             Console.ReadLine();
             sh.Close();

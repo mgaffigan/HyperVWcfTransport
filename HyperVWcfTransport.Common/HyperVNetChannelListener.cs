@@ -6,17 +6,18 @@ using System.Net.Sockets;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
+using static HyperVWcfTransport.Win32.NativeMethods;
 
 namespace HyperVWcfTransport.Common
 {
-    class WseTcpChannelListener : ChannelListenerBase<IDuplexSessionChannel>
+    class HyperVNetChannelListener : ChannelListenerBase<IDuplexSessionChannel>
     {
         BufferManager bufferManager;
         MessageEncoderFactory encoderFactory;
         Socket listenSocket;
         public override Uri Uri { get; }
 
-        public WseTcpChannelListener(WseTcpTransportBindingElement bindingElement, BindingContext context)
+        public HyperVNetChannelListener(HyperVNetBindingElement bindingElement, BindingContext context)
             : base(context.Binding)
         {
             // populate members from binding element
@@ -40,10 +41,10 @@ namespace HyperVWcfTransport.Common
 
         void OpenListenSocket()
         {
-            var localEndpoint = Hostname.ParseAsync(Uri.Authority, 8081).Result.Single();
-            this.listenSocket = new Socket(localEndpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            var localEndpoint = HyperVSocketEndPoint.Parse(this.Uri);
+            this.listenSocket = new Socket(AF_HYPERV, SocketType.Stream, HV_PROTOCOL_RAW);
             this.listenSocket.Bind(localEndpoint);
-            this.listenSocket.Listen(10);
+            this.listenSocket.Listen(1);
         }
 
         private void CloseListenSocket(TimeSpan timeout) => this.listenSocket.Close((int)timeout.TotalMilliseconds);
@@ -76,8 +77,8 @@ namespace HyperVWcfTransport.Common
 
         protected override IDuplexSessionChannel OnAcceptChannel(TimeSpan timeout)
         {
-            Socket dataSocket = listenSocket.Accept();
-            return new ServerTcpDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(Uri), this);
+            var dataSocket = listenSocket.Accept();
+            return new ServerDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(Uri), this);
         }
 
         protected override IAsyncResult OnBeginAcceptChannel(TimeSpan timeout, AsyncCallback callback, object state)
@@ -87,7 +88,7 @@ namespace HyperVWcfTransport.Common
                 try
                 {
                     var dataSocket = await listenSocket.AcceptAsync();
-                    return (IDuplexSessionChannel)new ServerTcpDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(this.Uri), this);
+                    return (IDuplexSessionChannel)new ServerDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(this.Uri), this);
                 }
                 catch (SocketException ex) when (ex.SocketErrorCode == SocketError.OperationAborted)
                 {
@@ -113,12 +114,12 @@ namespace HyperVWcfTransport.Common
 
         #endregion
 
-        class ServerTcpDuplexSessionChannel : WseTcpDuplexSessionChannel
+        class ServerDuplexSessionChannel : HyperVNetDuplexSessionChannel
         {
-            public ServerTcpDuplexSessionChannel(MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager,
+            public ServerDuplexSessionChannel(MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager,
                 Socket socket, EndpointAddress localAddress, ChannelManagerBase channelManager)
-                : base(messageEncoderFactory, bufferManager, WseTcpDuplexSessionChannel.AnonymousAddress, localAddress,
-                WseTcpDuplexSessionChannel.AnonymousAddress.Uri, channelManager)
+                : base(messageEncoderFactory, bufferManager, AnonymousAddress, localAddress,
+                AnonymousAddress.Uri, channelManager)
             {
                 base.InitializeSocket(socket);
             }

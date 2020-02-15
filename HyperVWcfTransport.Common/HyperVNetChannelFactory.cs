@@ -6,12 +6,12 @@ using System.ServiceModel.Channels;
 
 namespace HyperVWcfTransport.Common
 {
-    class WseTcpChannelFactory : ChannelFactoryBase<IDuplexSessionChannel>
+    class HyperVNetChannelFactory : ChannelFactoryBase<IDuplexSessionChannel>
     {
         BufferManager bufferManager;
         MessageEncoderFactory encoderFactory;
 
-        public WseTcpChannelFactory(WseTcpTransportBindingElement bindingElement, BindingContext context)
+        public HyperVNetChannelFactory(HyperVNetBindingElement bindingElement, BindingContext context)
             : base(context.Binding)
         {
             // populate members from binding element
@@ -45,7 +45,7 @@ namespace HyperVWcfTransport.Common
 
         protected override IDuplexSessionChannel OnCreateChannel(EndpointAddress remoteAddress, Uri via)
         {
-            return new WseClientTcpDuplexSessionChannel(encoderFactory, bufferManager, remoteAddress, via, this);
+            return new HyperVNetClientDuplexSessionChannel(encoderFactory, bufferManager, remoteAddress, via, this);
         }
     }
 }

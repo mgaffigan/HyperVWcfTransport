@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HyperVWcfTransport.Common
 {
-    abstract class WseTcpDuplexSessionChannel : ChannelBase, IDuplexSessionChannel
+    abstract class HyperVNetDuplexSessionChannel : ChannelBase, IDuplexSessionChannel
     {
         const int maxBufferSize = 64 * 1024;
         BufferManager bufferManager;
@@ -29,7 +29,7 @@ namespace HyperVWcfTransport.Common
         internal static readonly EndpointAddress AnonymousAddress =
             new EndpointAddress("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous");
 
-        protected WseTcpDuplexSessionChannel(
+        protected HyperVNetDuplexSessionChannel(
             MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager,
             EndpointAddress remoteAddress, EndpointAddress localAddress, Uri via, ChannelManagerBase channelManager)
             : base(channelManager)
@@ -611,10 +611,10 @@ namespace HyperVWcfTransport.Common
 
         class TcpDuplexSession : IDuplexSession
         {
-            WseTcpDuplexSessionChannel channel;
+            HyperVNetDuplexSessionChannel channel;
             string id;
 
-            public TcpDuplexSession(WseTcpDuplexSessionChannel channel)
+            public TcpDuplexSession(HyperVNetDuplexSessionChannel channel)
             {
                 this.channel = channel;
                 this.id = Guid.NewGuid().ToString();
