@@ -52,9 +52,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HyperVWcfTransport.Common\HyperVWcfTransport.Common.csproj">
+    <ProjectReference Include="..\HyperVWcfTransport.Common\HyperVWcfTransport.csproj">
       <Project>{704364E1-847F-4DC5-A84E-55FCBC773484}</Project>
-      <Name>HyperVWcfTransport.Common</Name>
+      <Name>HyperVWcfTransport</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HyperVWcfTransport.SampleCommon\HyperVWcfTransport.SampleCommon.csproj">
+      <Project>{e506079c-9e9d-4591-8853-c36f7d080703}</Project>
+      <Name>HyperVWcfTransport.SampleCommon</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

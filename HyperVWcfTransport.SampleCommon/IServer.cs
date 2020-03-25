@@ -11,6 +11,6 @@ namespace HyperVWcfTransport
     public interface IServer
     {
         [OperationContract]
-        string DoThing(string foo);
+        byte[] DoThing(string foo);
     }
 }

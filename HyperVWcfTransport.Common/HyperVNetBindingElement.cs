@@ -4,7 +4,7 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using System.Xml;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     class HyperVNetBindingElement
         : TransportBindingElement // to signal that we're a transport

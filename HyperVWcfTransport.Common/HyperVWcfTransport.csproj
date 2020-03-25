@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HyperVWcfTransport</RootNamespace>
-    <AssemblyName>HyperVWcfTransport.Common</AssemblyName>
+    <AssemblyName>HyperVWcfTransport</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -48,7 +48,6 @@
     <Compile Include="ApmHelpers\TapInterop.cs" />
     <Compile Include="HyperVNetClientDuplexSessionChannel.cs" />
     <Compile Include="HyperVNetBinding.cs" />
-    <Compile Include="IServer.cs" />
     <Compile Include="ApmHelpers\TypedAsyncResult.cs" />
     <Compile Include="ApmHelpers\TypedCompletedAsyncResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -3,7 +3,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     [Serializable]
     internal class HyperVSocketEndPoint : EndPoint

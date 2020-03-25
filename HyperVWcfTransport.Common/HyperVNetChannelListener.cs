@@ -8,10 +8,11 @@ using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using static HyperVWcfTransport.Win32.NativeMethods;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     class HyperVNetChannelListener : ChannelListenerBase<IDuplexSessionChannel>
     {
+        private readonly int maxBufferSize;
         BufferManager bufferManager;
         MessageEncoderFactory encoderFactory;
         Socket listenSocket;
@@ -21,7 +22,7 @@ namespace HyperVWcfTransport.Common
             : base(context.Binding)
         {
             // populate members from binding element
-            int maxBufferSize = (int)bindingElement.MaxReceivedMessageSize;
+            this.maxBufferSize = (int)bindingElement.MaxReceivedMessageSize;
             this.bufferManager = BufferManager.CreateBufferManager(bindingElement.MaxBufferPoolSize, maxBufferSize);
 
             var messageEncoderBindingElement = context.BindingParameters.OfType<MessageEncodingBindingElement>().SingleOrDefault();
@@ -78,7 +79,7 @@ namespace HyperVWcfTransport.Common
         protected override IDuplexSessionChannel OnAcceptChannel(TimeSpan timeout)
         {
             var dataSocket = listenSocket.Accept();
-            return new ServerDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(Uri), this);
+            return new ServerDuplexSessionChannel(this.encoderFactory, this.bufferManager, this.maxBufferSize, dataSocket, new EndpointAddress(Uri), this);
         }
 
         protected override IAsyncResult OnBeginAcceptChannel(TimeSpan timeout, AsyncCallback callback, object state)
@@ -88,7 +89,7 @@ namespace HyperVWcfTransport.Common
                 try
                 {
                     var dataSocket = await listenSocket.AcceptAsync();
-                    return (IDuplexSessionChannel)new ServerDuplexSessionChannel(this.encoderFactory, this.bufferManager, dataSocket, new EndpointAddress(this.Uri), this);
+                    return (IDuplexSessionChannel)new ServerDuplexSessionChannel(this.encoderFactory, this.bufferManager, this.maxBufferSize, dataSocket, new EndpointAddress(this.Uri), this);
                 }
                 catch (SocketException ex) when (ex.SocketErrorCode == SocketError.OperationAborted)
                 {
@@ -116,9 +117,9 @@ namespace HyperVWcfTransport.Common
 
         class ServerDuplexSessionChannel : HyperVNetDuplexSessionChannel
         {
-            public ServerDuplexSessionChannel(MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager,
+            public ServerDuplexSessionChannel(MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager, int maxBufferSize,
                 Socket socket, EndpointAddress localAddress, ChannelManagerBase channelManager)
-                : base(messageEncoderFactory, bufferManager, AnonymousAddress, localAddress,
+                : base(messageEncoderFactory, bufferManager, maxBufferSize, AnonymousAddress, localAddress,
                 AnonymousAddress.Uri, channelManager)
             {
                 base.InitializeSocket(socket);

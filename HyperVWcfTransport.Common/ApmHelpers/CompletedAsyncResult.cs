@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     //An AsyncResult that completes as soon as it is instantiated.
     class CompletedAsyncResult : AsyncResult

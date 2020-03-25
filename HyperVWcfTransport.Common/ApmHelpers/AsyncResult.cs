@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     abstract class AsyncResult : IAsyncResult
     {

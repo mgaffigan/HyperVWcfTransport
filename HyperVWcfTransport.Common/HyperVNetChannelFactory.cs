@@ -4,10 +4,11 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     class HyperVNetChannelFactory : ChannelFactoryBase<IDuplexSessionChannel>
     {
+        private readonly int maxBufferSize;
         BufferManager bufferManager;
         MessageEncoderFactory encoderFactory;
 
@@ -15,7 +16,7 @@ namespace HyperVWcfTransport.Common
             : base(context.Binding)
         {
             // populate members from binding element
-            int maxBufferSize = (int)bindingElement.MaxReceivedMessageSize;
+            this.maxBufferSize = (int)bindingElement.MaxReceivedMessageSize;
             this.bufferManager = BufferManager.CreateBufferManager(bindingElement.MaxBufferPoolSize, maxBufferSize);
 
             var messageEncoderElement = context.BindingParameters
@@ -45,7 +46,7 @@ namespace HyperVWcfTransport.Common
 
         protected override IDuplexSessionChannel OnCreateChannel(EndpointAddress remoteAddress, Uri via)
         {
-            return new HyperVNetClientDuplexSessionChannel(encoderFactory, bufferManager, remoteAddress, via, this);
+            return new HyperVNetClientDuplexSessionChannel(encoderFactory, bufferManager, maxBufferSize, remoteAddress, via, this);
         }
     }
 }

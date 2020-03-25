@@ -7,14 +7,14 @@ using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using static HyperVWcfTransport.Win32.NativeMethods;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     class HyperVNetClientDuplexSessionChannel : HyperVNetDuplexSessionChannel
     {
         public HyperVNetClientDuplexSessionChannel(
-            MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager,
+            MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager, int maxBufferSize,
             EndpointAddress remoteAddress, Uri via, ChannelManagerBase channelManager)
-            : base(messageEncoderFactory, bufferManager, remoteAddress, AnonymousAddress, via, channelManager)
+            : base(messageEncoderFactory, bufferManager, maxBufferSize, remoteAddress, AnonymousAddress, via, channelManager)
         {
         }
 

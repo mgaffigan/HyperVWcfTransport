@@ -1,6 +1,6 @@
 ﻿using System.ServiceModel.Channels;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     public class HyperVNetBinding : Binding, IBindingRuntimePreferences
     {
@@ -8,9 +8,23 @@ namespace HyperVWcfTransport.Common
         BinaryMessageEncodingBindingElement encoding;
 
         public HyperVNetBinding()
+            : this(256)
+        {
+        }
+
+        public HyperVNetBinding(int mbMaxRead)
         {
             transport = new HyperVNetBindingElement();
             encoding = new BinaryMessageEncodingBindingElement();
+
+            const int mb = 1024 /* kb */ * 1024;
+            var limit = mbMaxRead * mb;
+            transport.MaxBufferPoolSize = limit;
+            transport.MaxReceivedMessageSize = limit;
+            encoding.MaxWritePoolSize = limit;
+            encoding.ReaderQuotas.MaxBytesPerRead = limit;
+            encoding.ReaderQuotas.MaxStringContentLength = limit;
+            encoding.ReaderQuotas.MaxArrayLength = limit;
         }
 
         bool IBindingRuntimePreferences.ReceiveSynchronously

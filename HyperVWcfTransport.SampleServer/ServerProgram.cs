@@ -1,4 +1,4 @@
-﻿using HyperVWcfTransport.Common;
+﻿using HyperVWcfTransport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +12,13 @@ namespace HyperVWcfTransport.SampleServer
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     class SampleServer : IServer
     {
-        public string DoThing(string foo)
+        public byte[] DoThing(string foo)
         {
             Console.WriteLine($"Received {foo}");
-            return $"Hello {foo}";
+            var d = new byte[64 * 1024 * 1024];
+            var rand = new System.Security.Cryptography.RNGCryptoServiceProvider();
+            rand.GetBytes(d);
+            return d;
         }
     }
 

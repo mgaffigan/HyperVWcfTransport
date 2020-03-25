@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     //A strongly typed AsyncResult that completes as soon as it is instantiated.
     class TypedCompletedAsyncResult<T> : TypedAsyncResult<T>

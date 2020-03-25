@@ -5,11 +5,11 @@ using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HyperVWcfTransport.Common
+namespace HyperVWcfTransport
 {
     abstract class HyperVNetDuplexSessionChannel : ChannelBase, IDuplexSessionChannel
     {
-        const int maxBufferSize = 64 * 1024;
+        int maxBufferSize;
         BufferManager bufferManager;
         Socket socket;
         object readLock = new object();
@@ -30,7 +30,7 @@ namespace HyperVWcfTransport.Common
             new EndpointAddress("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous");
 
         protected HyperVNetDuplexSessionChannel(
-            MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager,
+            MessageEncoderFactory messageEncoderFactory, BufferManager bufferManager, int maxBufferSize,
             EndpointAddress remoteAddress, EndpointAddress localAddress, Uri via, ChannelManagerBase channelManager)
             : base(channelManager)
         {
@@ -41,6 +41,7 @@ namespace HyperVWcfTransport.Common
             this.Session = new TcpDuplexSession(this);
             this.MessageEncoder = messageEncoderFactory.CreateSessionEncoder();
             this.bufferManager = bufferManager;
+            this.maxBufferSize = maxBufferSize;
         }
 
         protected void InitializeSocket(Socket socket)

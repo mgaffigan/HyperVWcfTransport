@@ -1,4 +1,4 @@
-﻿using HyperVWcfTransport.Common;
+﻿using HyperVWcfTransport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +16,10 @@ namespace HyperVWcfTransport.SampleClient
         {
             Thread.Sleep(250);
 
-            var client = new ServerClient(new EndpointAddress("hypervnb://642d4719-f5d7-477d-9ca3-2c46c280052d/C7240163-6E2B-4466-9E41-FF74E7F0DE47"));
+            var client = new ServerClient(new EndpointAddress("hypervnb://e0e16197-dd56-4a10-9195-5ee7a155a838/C7240163-6E2B-4466-9E41-FF74E7F0DE47"));
             client.Open();
-            Console.WriteLine(client.DoThing("bar"));
-            Console.WriteLine(client.DoThing(Console.ReadLine()));
+            var d = client.DoThing("bar");
+            Console.WriteLine(d.Length);
             client.Close();
             Console.ReadLine();
         }
@@ -32,6 +32,6 @@ namespace HyperVWcfTransport.SampleClient
         {
         }
 
-        public string DoThing(string foo) => Channel.DoThing(foo);
+        public byte[] DoThing(string foo) => Channel.DoThing(foo);
     }
 }
